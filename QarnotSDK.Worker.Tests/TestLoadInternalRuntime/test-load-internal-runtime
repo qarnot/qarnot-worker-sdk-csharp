@@ -1,0 +1,56 @@
+#! /usr/bin/env python3
+
+import argparse
+import os
+import subprocess
+import sys
+
+
+def cmdline_parser():
+    parser = argparse.ArgumentParser(
+        description="Tests whether the internal DLL import works"
+    )
+
+    parser.add_argument("--runtime-class-name", required=True, type=str)
+    parser.add_argument("--runtime-dll-location", required=True)
+    parser.add_argument("--test-executable", required=True)
+
+    return parser
+
+def report_error(msg, proc=None):
+    print(msg, file=sys.stderr)
+    if proc:
+        print("STDOUT =====", file=sys.stderr)
+        print(proc.stdout, file=sys.stderr)
+        print("============", file=sys.stderr)
+        print("STDERR =====", file=sys.stderr)
+        print(proc.stderr, file=sys.stderr)
+        print("============", file=sys.stderr)
+    sys.exit(1)
+
+def main():
+    parser = cmdline_parser()
+    args = parser.parse_args()
+
+    os.environ["QARNOT_WORKER_INTERNAL_DLL"] = args.runtime_dll_location
+    os.environ["QARNOT_WORKER_INTERNAL_CLASS_NAME"] = args.runtime_class_name
+
+    if not os.path.isfile(args.runtime_dll_location):
+        report_error(f"runtime-dll-location: {args.runtime_dll_location} doesn't exist")
+
+    if not os.path.isfile(args.test_executable):
+        report_error(f"test-executable: {args.test_executable} doesn't exist")
+
+    proc = subprocess.run(args.test_executable, capture_output=True)
+
+    if proc.returncode != 0:
+        report_error(f"{args.test_executable}: returned with code {proc.returncode}", proc)
+
+    stdout = str(proc.stdout)
+    if args.runtime_class_name not in stdout:
+        report_error(f"expect stdout to contain {args.runtime_class_name}", proc)
+
+    print("PASSED: Internal runtime loaded")
+
+if __name__ == "__main__":
+    main()
