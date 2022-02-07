@@ -1,0 +1,50 @@
+image: Ubuntu2004
+
+# branches to build, including branches AND tags
+branches:
+  # whitelist
+  only:
+    - master
+    - /v\d+\.\d+\.\d+/
+
+environment:
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+
+
+configuration: Release
+
+test_script:
+  - /usr/bin/env python3 --version
+  - make tests
+
+# build:
+#   project: QarnotSDK.Worker
+#   include_nuget_references: true
+#   publish_nuget: true
+
+
+# If we don't do this checkout, we'll be in a detached head state as Appveyor checks out
+# the exact commit, and GitVersion won't know where it is.
+before_build:
+  - git checkout $APPVEYOR_REPO_BRANCH
+
+build_script:
+  - dotnet restore QarnotSDK.Worker
+  - dotnet build -c Release QarnotSDK.Worker
+  - dotnet pack -c Release QarnotSDK.Worker
+
+
+artifacts:
+  # pushing all *.nupkg files in build directory recursively
+  - path: '**\*.nupkg'
+    name: nuget package
+
+
+deploy:
+  provider: NuGet
+  api_key:
+    secure: vpiCpKoU7gYTS/7GCypuWfVmai74elXvTPBPK63sAaLPAWFuCqdllipl3O8FvbnJ
+  skip_symbols: true
+  on:
+    APPVEYOR_REPO_TAG: true

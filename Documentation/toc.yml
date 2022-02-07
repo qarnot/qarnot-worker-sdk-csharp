@@ -1,0 +1,3 @@
+- name: Worker SDK Documentation
+  href: sdk/
+  homepage: sdk/index.md
