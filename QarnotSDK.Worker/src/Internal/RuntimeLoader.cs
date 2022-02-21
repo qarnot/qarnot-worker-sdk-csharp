@@ -3,7 +3,14 @@ namespace QarnotSDK.Worker.Internal
     using System;
     using System.Reflection;
 
-    public sealed class RuntimeLoader
+    /// <summary>
+    /// This class encapsulates the logic used to load the Qarnot runtime
+    /// when the code is deployed on the Qarnot platform.
+    /// </summary>
+    /// <remarks>
+    /// This class is for internal use only and should not be used directly.
+    /// </remarks>
+    internal sealed class RuntimeLoader
     {
         private const string InternalDLLEnvVar = "QARNOT_WORKER_INTERNAL_DLL";
         private const string InternalClassNameEnvVar = "QARNOT_WORKER_INTERNAL_CLASS_NAME";

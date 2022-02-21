@@ -1,0 +1,10 @@
+apiRules:
+    - exclude:
+        uidRegex: ^QarnotSDK\.Worker\.Internal
+
+    - exclude:
+        uidRegex: ^QarnotSDK\.Worker\.Options\.Section
+
+    - exclude:
+        uidRegex: ^System\.Object
+        type: Type

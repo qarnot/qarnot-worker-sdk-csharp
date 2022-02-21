@@ -23,8 +23,14 @@ public class DummyInternalRuntime : IRuntime
     public async Task RunAsync(CancellationToken ct)
     {
         Console.WriteLine(typeof(DummyInternalRuntime).FullName);
-        await Worker!.RunAsync(ct);
-        await Worker!.OnStopAsync(ct);
+        try
+        {
+            await Worker!.RunAsync(ct);
+        }
+        finally
+        {
+            await Worker!.OnStopAsync(ct);
+        }
     }
 }
 

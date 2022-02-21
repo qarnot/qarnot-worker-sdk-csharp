@@ -7,7 +7,14 @@ namespace QarnotSDK.Worker.Internal
     using Microsoft.Extensions.Logging;
     using Microsoft.Extensions.DependencyInjection;
 
-    public sealed class LocalRuntime : IRuntime
+    /// <summary>
+    /// Local runtime used as a fallback when the Qarnot runtime is not configured to
+    /// be found.
+    /// </summary>
+    /// <remarks>
+    /// This class is for internal use only and should not be used directly.
+    /// </remarks>
+    internal sealed class LocalRuntime : IRuntime
     {
         private bool AlreadyRegisteredWorker = false;
         private readonly IHostBuilder HostBuilder;
@@ -45,8 +52,18 @@ namespace QarnotSDK.Worker.Internal
             AlreadyRegisteredWorker = true;
         }
 
-        public async Task RunAsync(CancellationToken ct) =>
-            await HostBuilder.Build().RunAsync(ct);
+        public async Task RunAsync(CancellationToken ct)
+        {
+            var cancellationSource = CancellationTokenSource.CreateLinkedTokenSource(ct);
+            await HostBuilder
+                .ConfigureServices(services =>
+                {
+                    services.AddSingleton<BoxedCancellationToken>(new BoxedCancellationToken(ct));
+                    services.AddSingleton<CancellationTokenSource>(cancellationSource);
+                })
+                .Build()
+                .RunAsync(cancellationSource.Token);
+        }
 
         public void Configure(Action<Options> configure) =>
             HostBuilder.ConfigureServices(services =>

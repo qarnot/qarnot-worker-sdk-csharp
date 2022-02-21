@@ -1,0 +1,8 @@
+###############
+#    folder   #
+###############
+/_site
+/docfx
+/obj
+/sdk/*
+!/sdk/index.md
