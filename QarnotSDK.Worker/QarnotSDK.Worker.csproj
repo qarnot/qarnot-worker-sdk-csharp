@@ -11,4 +11,14 @@
     </PackageReference>
   </ItemGroup>
 
+  <Choose>
+    <When Condition=" '$(SignAssemblies)' == 'True' ">
+      <PropertyGroup>
+        <SignAssembly>true</SignAssembly>
+        <DelaySign>false</DelaySign>
+        <AssemblyOriginatorKeyFile>..\strong-name-signing-key.snk</AssemblyOriginatorKeyFile>
+      </PropertyGroup>
+    </When>
+  </Choose>
+
 </Project>
