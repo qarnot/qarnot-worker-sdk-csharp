@@ -5,11 +5,14 @@ branches:
   # whitelist
   only:
     - master
+    - prerelease
     - /v\d+\.\d+\.\d+/
 
 environment:
   DOTNET_CLI_TELEMETRY_OPTOUT: true
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+  QARNOT_STRONG_NAME_SIGNING_KEY_SECURE:
+    secure: eMdxgfWrUE+V6ODxJnGOkb/5kxc8b3fguBTVVNW+BXTPwDZONfvMfy2JLtlLuiIsGlvNMkAo26wFyqNgy5vNKd5ylSlns+X31fKjxzLYmiJx5fWOaJKoefejLdupBTUXr44YR1GRHUDdXbR7e1B+QYAeqdr5LIQazXS7g7oFfFW6N/EFCtGIEjLzvneQGXzeaSUrPQoXkqs3JZOa9nWi+9+jhJEYxigrbcObr2UmFFSfC4fHP5d+VIX8AUyXb4KriO1dzTBCDhZhmeNModmsxczH1sXSq+rJOs83bAdQm4jGVld84aXAwTch8/U0ClitV2ls8Mc2lpBIRSUEtkIp3WYiBwi3nVtCw+plNWn+f1iFr0sCCkplJO/o1J2REQH8E25NaZpTj9dB9tsfYoehDKmcoT+fqGAsZlHjPcCovR9bVdHHuY7xmX/VFphoM8VmPSDfNcn51i2glH1q8KBZKzCHCu/xeyPqqDhgoBUIZ53QnQNyuQYpEdr1GzMPwGF3XapbUNO5zPvXjvTMyTBxWJ/CIjMjWSuda6sSMoAXHnxYnfGuc2UCrjBHSxYjl5McMWE0ayBrWcVHzHsfMcwMSO3ribJpvs3t+N4ds5dVItWu0LEiS3iMm6yQbMp+ZIc3Jkgdgvh+XG70NTzwWifdQBLGVU7mu9GUbwShC/f623vNwE4qe5EDQQWszt7ibGLdFXtljuRTQqdaUzpbpBmgRrmDNaWCKLqTiK309PpxhrMq2HuH0XkqJ8TTI0yQ0sjyCAiYXVUNfdVnTYVdpMgsXwQ1Ubu0w/kCY9qldyLvvOg1VugqLwp761nMG68L53mQf6sCMpMNYYEhJI2VoYLH4GRX4J4nN7KVm5Qg2w3paogVYyD4ptgW+gFy8/1R5sK7ACzPfDFIYje1p/YGEkb2ZHQZp9sHN+qE9vCUeeDVKczF+J56lSPx2bhN/JpoJ4Bf53jZan18DmHCMNCg0TsRrx+SjKiLpzqiH8UXtuqWbgaNIy13Rk2/Ja1wMXOKoI1AryDji7A9uH9rWi9EqbAIFll06jibNpABongIC6aFKU4=
 
 
 configuration: Release
@@ -30,8 +33,9 @@ before_build:
   - git checkout $APPVEYOR_REPO_BRANCH
 
 build_script:
+  - echo $QARNOT_STRONG_NAME_SIGNING_KEY_SECURE | base64 -d > strong-name-signing-key.snk
   - dotnet restore QarnotSDK.Worker
-  - dotnet build -c Release QarnotSDK.Worker
+  - dotnet build -c Release QarnotSDK.Worker -p:SignAssemblies=True
   - dotnet pack -c Release QarnotSDK.Worker
 
 
