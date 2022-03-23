@@ -5,6 +5,7 @@ branches:
   # whitelist
   only:
     - master
+    - prerelease
     - /v\d+\.\d+\.\d+/
 
 environment:
